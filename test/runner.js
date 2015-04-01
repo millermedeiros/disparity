@@ -19,7 +19,7 @@ function compare(diff, expected, name) {
     process.stderr.write(expected);
     process.stderr.write('=== actual result:\n');
     process.stderr.write(diff);
-    process.exit(1);
+    throw new Error('assertion error');
   }
 }
 
@@ -54,6 +54,33 @@ compare(diff, expected, 'unified_2');
 diff = disparity.unifiedNoColor(file1, file2, 'test/file1.js', 'test/file2.js');
 expected = readFile('unified_no_color.txt');
 compare(diff, expected, 'unified_no_color');
+
+// custom colors
+// =============
+
+var _oldColors = disparity.colors;
+// wrap blocks into custom tags
+disparity.colors = {
+  // chars diff
+  charsRemoved: { open: '<bggreen>', close: '</bggreen>' },
+  charsAdded: { open: '<bgred>', close: '</bgred>' },
+
+  // unified diff
+  removed: { open: '<red>', close: '</red>' },
+  added: { open: '<green>', close: '</green>' },
+  header: { open: '<yellow>', close: '</yellow>' },
+  section: { open: '<magenta>', close: '</magenta>' }
+};
+
+diff = disparity.chars(file1, file2);
+expected = readFile('chars.html');
+compare(diff, expected, 'chars.html');
+
+diff = disparity.unified(file1, file2, 'test/file1.js', 'test/file2.js');
+expected = readFile('unified.html');
+compare(diff, expected, 'unified.html');
+
+disparity.colors = _oldColors;
 
 // cli.parse
 // =========

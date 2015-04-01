@@ -2,6 +2,7 @@
 
 ## v1.3.0 (2015/04/01)
 
+ - add support for custom colors.
  - update unified color scheme.
  - simplify line splitting logic.
  - improve way strings are colorized (avoids `\n` and `\r` chars).

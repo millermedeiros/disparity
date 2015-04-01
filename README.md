@@ -97,6 +97,27 @@ String used on the diff headers to say that chars/lines was added.
 disparity.added = 'added';
 ```
 
+### colors:Object
+
+Object containing references to all the colors used by disparity.
+
+If you want a different output than `ansi` you can replace the color values:
+
+```js
+// wrap blocks into custom tags
+disparity.colors = {
+  // chars diff
+  charsRemoved: { open: '<bggreen>', close: '</bggreen>' },
+  charsAdded: { open: '<bgred>', close: '</bgred>' },
+
+  // unified diff
+  removed: { open: '<red>', close: '</red>' },
+  added: { open: '<green>', close: '</green>' },
+  header: { open: '<yellow>', close: '</yellow>' },
+  section: { open: '<magenta>', close: '</magenta>' }
+};
+```
+
 ## CLI
 
 `disparity` also have a command line interface:

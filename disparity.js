@@ -2,7 +2,6 @@
 
 var stringDiff = require('diff');
 var ansi = require('ansi-styles');
-var hasAnsi = require('has-ansi');
 
 // ---
 
@@ -11,6 +10,14 @@ exports.unifiedNoColor = unifiedNoColor;
 exports.chars = chars;
 exports.removed = 'removed';
 exports.added = 'added';
+exports.colors = {
+  charsRemoved: ansi.bgRed,
+  charsAdded: ansi.bgGreen,
+  removed: ansi.red,
+  added: ansi.green,
+  header: ansi.yellow,
+  section: ansi.magenta,
+};
 
 // ---
 
@@ -30,14 +37,15 @@ function chars(oldStr, newStr, opts) {
   // text displayed before diff
   var header = opts.header;
   if (header == null) {
-    header = bgRed(exports.removed) + ' ' + bgGreen(exports.added) + '\n\n';
+    header = colorize(exports.removed, 'charsRemoved') + ' ' +
+      colorize(exports.added, 'charsAdded') + '\n\n';
   }
 
   var changes = stringDiff.diffChars(oldStr, newStr);
   var diff = changes.map(function(c) {
     var val = replaceInvisibleChars(c.value);
-    if (c.added) return bgGreen(val);
-    if (c.removed) return bgRed(val);
+    if (c.added) return colorize(val, 'charsAdded');
+    if (c.removed) return colorize(val, 'charsRemoved');
     return val;
   }).join('');
 
@@ -55,31 +63,8 @@ function chars(oldStr, newStr, opts) {
   return header + lines.join('');
 }
 
-function bgGreen(str) {
-  return colorize(str, ansi.bgGreen);
-}
-
-function bgRed(str) {
-  return colorize(str, ansi.bgRed);
-}
-
-function green(str) {
-  return colorize(str, ansi.green);
-}
-
-function red(str) {
-  return colorize(str, ansi.red);
-}
-
-function yellow(str) {
-  return colorize(str, ansi.yellow);
-}
-
-function magenta(str) {
-  return colorize(str, ansi.magenta);
-}
-
-function colorize(str, color) {
+function colorize(str, colorId) {
+  var color = exports.colors[colorId];
   // avoid highlighting the "\n" (would highlight till the end of the line)
   return str.replace(/[^\n\r]+/g, color.open + '$&' + color.close);
 }
@@ -100,7 +85,7 @@ function rightAlign(val, nChars) {
 function removeLinesOutOfContext(lines, context) {
   var diffMap = {};
   function hasDiff(line, i) {
-    if (diffMap[i] || hasAnsi(line)) {
+    if (diffMap[i] || hasCharDiff(line)) {
       diffMap[i] = true;
       return true;
     }
@@ -132,6 +117,15 @@ function removeLinesOutOfContext(lines, context) {
   });
 }
 
+function hasCharDiff(line) {
+  return line.indexOf(exports.colors.charsAdded.open) !== -1 ||
+    line.indexOf(exports.colors.charsRemoved.open) !== -1;
+}
+
+function escapeRegExp(str) {
+  return str.replace(/\W/g,'\\$&');
+}
+
 function unified(oldStr, newStr, filePathOld, filePathNew) {
   if (newStr === oldStr) {
     return '';
@@ -142,11 +136,11 @@ function unified(oldStr, newStr, filePathOld, filePathNew) {
   var lines = changes.split(/^/m);
 
   // we avoid colorizing the line breaks
-  var start = yellow(lines.slice(0, 2).join(''));
+  var start = colorize(lines.slice(0, 2).join(''), 'header');
   var end = lines.slice(2).join('')
-    .replace(/^\-.*/gm, red('$&'))
-    .replace(/^\+.*/gm, green('$&'))
-    .replace(/^@@.+@@/gm, magenta('$&'));
+    .replace(/^\-.*/gm, colorize('$&', 'removed'))
+    .replace(/^\+.*/gm, colorize('$&', 'added'))
+    .replace(/^@@.+@@/gm, colorize('$&', 'section'));
 
   return start + end;
 }

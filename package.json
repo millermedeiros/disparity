@@ -31,8 +31,7 @@
   "homepage": "https://github.com/millermedeiros/disparity",
   "dependencies": {
     "ansi-styles": "^2.0.1",
-    "diff": "^1.3.2",
-    "has-ansi": "^1.0.3"
+    "diff": "^1.3.2"
   },
   "jshintConfig": {
     "node": true,
