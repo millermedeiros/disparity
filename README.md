@@ -64,6 +64,21 @@ Will return an empty string if `oldStr === newStr`;
 
 ![screenshot unified diff](https://raw.githubusercontent.com/millermedeiros/disparity/master/unified_diff.png)
 
+## CLI
+
+`disparity` also have a command line interface:
+
+```
+disparity [OPTIONS] <file_1> <file_2>
+
+Options:
+  -u, --unified  Output unified diff.
+  -c, --chars    Output char diff (default mode).
+  -v, --version  Display current version.
+  -h, --help     Display this help.
+```
+
+PS: cli can only compare 2 external files at the moment, no `stdin` support.
 
 ## License
 
