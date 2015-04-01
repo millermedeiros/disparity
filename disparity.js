@@ -8,6 +8,8 @@ var hasAnsi = require('has-ansi');
 
 exports.unified = unified;
 exports.chars = chars;
+exports.removed = 'removed';
+exports.added = 'added';
 
 // ---
 
@@ -27,7 +29,7 @@ function chars(oldStr, newStr, opts) {
   // text displayed before diff
   var header = opts.header;
   if (header == null) {
-    header = bgRed('removed') + ' ' + bgGreen('added') + '\n\n';
+    header = bgRed(exports.removed) + ' ' + bgGreen(exports.added) + '\n\n';
   }
 
   var changes = stringDiff.diffChars(oldStr, newStr);
@@ -146,7 +148,7 @@ function unified(oldStr, newStr, filePathOld, filePathNew) {
   filePathOld = filePathOld || '';
   filePathNew = filePathNew || filePathOld;
 
-  var changes = stringDiff.createPatch('', oldStr, newStr, 'removed', 'added');
+  var changes = stringDiff.createPatch('', oldStr, newStr, exports.removed, exports.added);
 
   // remove first 2 lines (header)
   changes = changes.replace(/^([^\n]+)\n([^\n]+)\n/m, '');

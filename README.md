@@ -64,6 +64,24 @@ Will return an empty string if `oldStr === newStr`;
 
 ![screenshot unified diff](https://raw.githubusercontent.com/millermedeiros/disparity/master/unified_diff.png)
 
+### removed:String
+
+String used on the diff headers to say that chars/lines was removed.
+
+```js
+// default value
+disparity.removed = 'removed';
+```
+
+### added:String
+
+String used on the diff headers to say that chars/lines was added.
+
+```js
+// default value
+disparity.added = 'added';
+```
+
 ## CLI
 
 `disparity` also have a command line interface:
