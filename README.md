@@ -48,7 +48,7 @@ var opts = {
 };
 ```
 
-![screenshot char diff](https://github.com/millermedeiros/disparity/chars_diff.png)
+![screenshot char diff](https://raw.githubusercontent.com/millermedeiros/disparity/master/chars_diff.png)
 
 ### unified(oldStr, newStr[, filePathOld, filePathNew]):String
 
@@ -62,7 +62,7 @@ console.log(diff);
 
 Will return an empty string if `oldStr === newStr`;
 
-![screenshot unified diff](https://github.com/millermedeiros/disparity/unified_diff.png)
+![screenshot unified diff](https://raw.githubusercontent.com/millermedeiros/disparity/master/unified_diff.png)
 
 
 ## License
