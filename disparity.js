@@ -79,7 +79,7 @@ function replaceInvisibleChars(str) {
 function rightAlign(val, nChars) {
   val = val.toString();
   var diff = nChars - val.length;
-  return diff ? (new Array(diff)).join(' ') + val : val;
+  return diff ? (new Array(diff + 1)).join(' ') + val : val;
 }
 
 function removeLinesOutOfContext(lines, context) {

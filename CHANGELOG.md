@@ -1,5 +1,9 @@
 # disparity changelog
 
+## v1.3.1 (2015/04/01)
+
+ - fix line number alignment.
+
 ## v1.3.0 (2015/04/01)
 
  - add support for custom colors.
