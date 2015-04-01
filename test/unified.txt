@@ -1,0 +1,22 @@
+[31m--- removed[39m
+[32m+++ added[39m
+[33m@@ -1,9 +1,8 @@[39m
+ var foo = "bar";
+ 
+ // some comment
+[32m+function dolor(){ amet()[39m
+[31m-function dolor(){[39m
+[31m-  amet();[39m
+ }
+ 
+ // no changes until line 19
+ var a = function() {
+[33m@@ -15,7 +14,7 @@[39m
+ thisWontShowOnDiff();
+ thisShouldBeFirstLineOfLine18Diff();
+ // yeap this will show too
+ 
+[32m+dolor (	a);[39m
+[31m-dolor(a);[39m
+ amet();
+ // EOF
