@@ -12,7 +12,7 @@ var a = function() {
 // some other comment
 
 thisWontShowOnDiff();
-thisShouldBeFirstLineOfLine18Diff();
+thisShouldBeFirstLineOfLine19Diff();
 // yeap this will show too
 
 dolor (	a);

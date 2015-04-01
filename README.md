@@ -44,25 +44,40 @@ var opts = {
   // how many lines to display before/after a line that contains diffs
   context: 3,
   // text displayed just before the diff
-  header: '\u001b[41mmremoved\u001b[49m \u001b[42madded\u001b[49m\n\n'
+  header: '\u001b[41m' + disparity.removed '\u001b[49m \u001b[42m' +
+    disparity.added + '\u001b[49m\n\n'
 };
 ```
 
-![screenshot char diff](https://raw.githubusercontent.com/millermedeiros/disparity/master/chars_diff.png)
+![screenshot char diff](https://raw.githubusercontent.com/millermedeiros/disparity/master/screenshots/chars.png)
 
 ### unified(oldStr, newStr[, filePathOld, filePathNew]):String
 
 Returns ansi colorized [unified
 diff](http://en.wikipedia.org/wiki/Diff_utility#Unified_format).
 
+Will return an empty string if `oldStr === newStr`;
+
 ```js
 var diff = disparity.unified(file1, file2);
 console.log(diff);
 ```
 
+![screenshot unified diff](https://raw.githubusercontent.com/millermedeiros/disparity/master/screenshots/unified.png)
+
+### unifiedNoColor(oldStr, newStr[, filePathOld, filePathNew]):String
+
+Returns [unified diff](http://en.wikipedia.org/wiki/Diff_utility#Unified_format).
+Useful for terminals that [doesn't support colors](https://www.npmjs.com/package/supports-color).
+
 Will return an empty string if `oldStr === newStr`;
 
-![screenshot unified diff](https://raw.githubusercontent.com/millermedeiros/disparity/master/unified_diff.png)
+```js
+var diff = disparity.unifiedNoColor(file1, file2);
+console.log(diff);
+```
+
+![screenshot unified diff no color](https://raw.githubusercontent.com/millermedeiros/disparity/master/screenshots/unified_no_color.png)
 
 ### removed:String
 
@@ -90,8 +105,9 @@ disparity.added = 'added';
 disparity [OPTIONS] <file_1> <file_2>
 
 Options:
-  -u, --unified  Output unified diff.
   -c, --chars    Output char diff (default mode).
+  -u, --unified  Output unified diff.
+  --no-color     Don't output colors.
   -v, --version  Display current version.
   -h, --help     Display this help.
 ```

@@ -9,6 +9,7 @@ exports.parse = function(argv) {
     help: argv.indexOf('--help') !== -1 || argv.indexOf('-h') !== -1 || !argv.length,
     version: argv.indexOf('--version') !== -1 || argv.indexOf('-v') !== -1,
     unified: argv.indexOf('-u') !== -1 || argv.indexOf('--unified') !== -1,
+    noColor: argv.indexOf('--no-color') !== -1,
     filePath1: argv[argv.length - 2] || '--',
     filePath2: argv[argv.length - 1] || '--',
     errors: []
@@ -20,6 +21,10 @@ exports.parse = function(argv) {
   if (!args.help && !args.version &&
     (args.filePath1.match(re) || args.filePath2.match(re))) {
     args.errors.push('Error: missing or invalid <file_1> and/or <file_2> path.');
+  }
+
+  if (args.noColor && args.chars) {
+    args.errors.push('Error: "--no-color" flag can only be used with "--unified" diff.');
   }
 
   return args;
@@ -55,7 +60,8 @@ exports.run = function(args, out, err) {
   var f2 = fs.readFileSync(p2).toString();
 
   if (args.unified) {
-    out.write(disparity.unified(f1, f2, p1, p2));
+    var method = args.noColor ? 'unifiedNoColor' : 'unified';
+    out.write(disparity[method](f1, f2, p1, p2));
     return 0;
   }
 

@@ -8,7 +8,7 @@
 6 | }<LF>
 7 | <LF>
 8 | // no changes until line 19<LF>
-16 | thisShouldBeFirstLineOfLine18Diff();<LF>
+16 | thisShouldBeFirstLineOfLine19Diff();<LF>
 17 | // yeap this will show too<LF>
 18 | <LF>
 19 | dolor[42m [49m([42m<tab>[49ma);<LF>

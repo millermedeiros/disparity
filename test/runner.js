@@ -26,14 +26,15 @@ function compare(diff, expected, name) {
 // setup
 // =====
 
+var diff, expected;
 var file1 = readFile('file1.js');
 var file2 = readFile('file2.js');
 
 // chars
 // =====
 
-var diff = disparity.chars(file1, file2);
-var expected = readFile('chars.txt');
+diff = disparity.chars(file1, file2);
+expected = readFile('chars.txt');
 compare(diff, expected, 'chars');
 
 // unified
@@ -46,6 +47,13 @@ compare(diff, expected, 'unified');
 diff = disparity.unified(file1, file2, 'test/file1.js', 'test/file2.js');
 expected = readFile('unified_2.txt');
 compare(diff, expected, 'unified_2');
+
+// unifiedNoColor
+// ==============
+
+diff = disparity.unifiedNoColor(file1, file2, 'test/file1.js', 'test/file2.js');
+expected = readFile('unified_no_color.txt');
+compare(diff, expected, 'unified_no_color');
 
 // cli.parse
 // =========
@@ -87,6 +95,14 @@ assert.ok(args.chars, '-c');
 args = cli.parse(['--chars', 'foo.js', 'bar.js']);
 assert.ok(!args.unified, '!--unified');
 assert.ok(args.chars, '--chars');
+
+args = cli.parse(['--no-color', 'foo.js', 'bar.js']);
+assert.ok(args.errors.length, '--no-color errors');
+assert.ok(args.noColor, '--no-color');
+
+args = cli.parse(['--unified', '--no-color', 'foo.js', 'bar.js']);
+assert.ok(!args.errors.length, '--unified --no-color errors');
+assert.ok(args.noColor, '--no-color');
 
 // cli.run
 // =======
@@ -138,6 +154,17 @@ code = run({
   filePath2: 'test/file2.js'
 });
 expected = readFile('unified_2.txt');
+assert.ok(!code, 'exit code chars');
+assert.equal(out.data, expected);
+assert.equal(err.data, '');
+
+code = run({
+  unified: true,
+  noColor: true,
+  filePath1: 'test/file1.js',
+  filePath2: 'test/file2.js'
+});
+expected = readFile('unified_no_color.txt');
 assert.ok(!code, 'exit code chars');
 assert.equal(out.data, expected);
 assert.equal(err.data, '');

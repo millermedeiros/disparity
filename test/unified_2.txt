@@ -13,7 +13,7 @@
  var a = function() {
 [33m@@ -15,7 +14,7 @@[39m
  thisWontShowOnDiff();
- thisShouldBeFirstLineOfLine18Diff();
+ thisShouldBeFirstLineOfLine19Diff();
  // yeap this will show too
  
 [32m+dolor (	a);[39m

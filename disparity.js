@@ -7,6 +7,7 @@ var hasAnsi = require('has-ansi');
 // ---
 
 exports.unified = unified;
+exports.unifiedNoColor = unifiedNoColor;
 exports.chars = chars;
 exports.removed = 'removed';
 exports.added = 'added';
@@ -88,7 +89,6 @@ function colorize(str, color) {
   }).join('\n');
 }
 
-
 function replaceInvisibleChars(str) {
   return str
     .replace(/\t/g, '<tab>')
@@ -96,13 +96,11 @@ function replaceInvisibleChars(str) {
     .replace(/\n/g, '<LF>\n');
 }
 
-
 function rightAlign(val, nChars) {
   val = val.toString();
   var diff = nChars - val.length;
   return diff ? (new Array(diff)).join(' ') + val : val;
 }
-
 
 function removeLinesOutOfContext(lines, context) {
   var diffMap = {};
@@ -139,8 +137,20 @@ function removeLinesOutOfContext(lines, context) {
   });
 }
 
-
 function unified(oldStr, newStr, filePathOld, filePathNew) {
+  if (newStr === oldStr) {
+    return '';
+  }
+
+  var changes = unifiedNoColor(oldStr, newStr, filePathOld, filePathNew)
+    .replace(/^\-.*/gm, red('$&'))
+    .replace(/^\+.*/gm, green('$&'))
+    .replace(/^@@.+/gm, yellow('$&'));
+
+  return changes;
+}
+
+function unifiedNoColor(oldStr, newStr, filePathOld, filePathNew) {
   if (newStr === oldStr) {
     return '';
   }
@@ -160,11 +170,6 @@ function unified(oldStr, newStr, filePathOld, filePathNew) {
   changes = changes
     .replace(/^\+\+\+\s+/gm, appendPath('+++', filePathNew))
     .replace(/^---\s+/gm, appendPath('---', filePathOld));
-
-  changes = changes
-    .replace(/^\-.*/gm, red('$&'))
-    .replace(/^\+.*/gm, green('$&'))
-    .replace(/^@@.+/gm, yellow('$&'));
 
   return changes;
 }
