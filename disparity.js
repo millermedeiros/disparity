@@ -41,13 +41,8 @@ function chars(oldStr, newStr, opts) {
     return val;
   }).join('');
 
-  var endsWithLineBreak = (/\n$/m).test(diff);
-  var lines = diff.split('\n');
-
-  // if it ends with line break it would add an extra empty line at the end
-  if (endsWithLineBreak) {
-    lines.pop();
-  }
+  // this RegExp will include the '\n' char into the lines, easier to join()
+  var lines = diff.split(/^/m);
 
   // add line numbers
   var nChars = lines.length.toString().length;
@@ -57,8 +52,7 @@ function chars(oldStr, newStr, opts) {
 
   lines = removeLinesOutOfContext(lines, context);
 
-  var eof = endsWithLineBreak ? '\n' : '';
-  return header + lines.join('\n') + eof;
+  return header + lines.join('');
 }
 
 function bgGreen(str) {
@@ -81,12 +75,13 @@ function yellow(str) {
   return colorize(str, ansi.yellow);
 }
 
+function magenta(str) {
+  return colorize(str, ansi.magenta);
+}
+
 function colorize(str, color) {
-  // we need to split the lines to avoid highlighting the "\n" (would highlight
-  // till the end of the line)
-  return str.split('\n').map(function(s) {
-    return color.open + s + color.close;
-  }).join('\n');
+  // avoid highlighting the "\n" (would highlight till the end of the line)
+  return str.replace(/[^\n\r]+/g, color.open + '$&' + color.close);
 }
 
 function replaceInvisibleChars(str) {
@@ -142,12 +137,18 @@ function unified(oldStr, newStr, filePathOld, filePathNew) {
     return '';
   }
 
-  var changes = unifiedNoColor(oldStr, newStr, filePathOld, filePathNew)
+  var changes = unifiedNoColor(oldStr, newStr, filePathOld, filePathNew);
+  // this RegExp will include all the `\n` chars into the lines, easier to join
+  var lines = changes.split(/^/m);
+
+  // we avoid colorizing the line breaks
+  var start = yellow(lines.slice(0, 2).join(''));
+  var end = lines.slice(2).join('')
     .replace(/^\-.*/gm, red('$&'))
     .replace(/^\+.*/gm, green('$&'))
-    .replace(/^@@.+/gm, yellow('$&'));
+    .replace(/^@@.+@@/gm, magenta('$&'));
 
-  return changes;
+  return start + end;
 }
 
 function unifiedNoColor(oldStr, newStr, filePathOld, filePathNew) {

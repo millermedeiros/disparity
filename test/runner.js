@@ -14,11 +14,11 @@ function readFile(name) {
 function compare(diff, expected, name) {
   if (diff !== expected) {
     // not using assert because it is easier to understand what is wrong
-    console.error('disparity.' + name + '() failure!');
-    console.error('=== expected result:');
-    console.error(expected);
-    console.error('=== actual result:');
-    console.error(diff);
+    process.stderr.write('disparity.' + name + '() failure!\n');
+    process.stderr.write('=== expected result:\n');
+    process.stderr.write(expected);
+    process.stderr.write('=== actual result:\n');
+    process.stderr.write(diff);
     process.exit(1);
   }
 }
