@@ -17,7 +17,7 @@ function compare(diff, expected, name) {
     process.stderr.write('disparity.' + name + '() failure!\n');
     process.stderr.write('=== expected result:\n');
     process.stderr.write(expected);
-    process.stderr.write('=== actual result:\n');
+    process.stderr.write('\n=== actual result:\n');
     process.stderr.write(diff);
     throw new Error('assertion error');
   }
@@ -44,14 +44,18 @@ diff = disparity.unified(file1, file2);
 expected = readFile('unified.txt');
 compare(diff, expected, 'unified');
 
-diff = disparity.unified(file1, file2, 'test/file1.js', 'test/file2.js');
+diff = disparity.unified(file1, file2, {
+  paths: ['test/file1.js', 'test/file2.js']
+});
 expected = readFile('unified_2.txt');
 compare(diff, expected, 'unified_2');
 
 // unifiedNoColor
 // ==============
 
-diff = disparity.unifiedNoColor(file1, file2, 'test/file1.js', 'test/file2.js');
+diff = disparity.unifiedNoColor(file1, file2, {
+  paths: ['test/file1.js', 'test/file2.js']
+});
 expected = readFile('unified_no_color.txt');
 compare(diff, expected, 'unified_no_color');
 
@@ -76,7 +80,9 @@ diff = disparity.chars(file1, file2);
 expected = readFile('chars.html');
 compare(diff, expected, 'chars.html');
 
-diff = disparity.unified(file1, file2, 'test/file1.js', 'test/file2.js');
+diff = disparity.unified(file1, file2, {
+  paths: ['test/file1.js', 'test/file2.js']
+});
 expected = readFile('unified.html');
 compare(diff, expected, 'unified.html');
 
@@ -100,19 +106,18 @@ assert.ok(args.version, 'version');
 assert.equal(args.errors.length, 0, 'error 2');
 
 args = cli.parse(['-u']);
-assert.equal(args.errors[0], 'Error: missing or invalid <file_1> and/or <file_2> path.', 'error 3');
+compare(args.errors[0], 'Error: you should provide 2 file paths, found "0".', 'error 3');
 
 args = cli.parse(['-u', 'foo.js', '--bar']);
 assert.ok(args.unified, '-u');
-assert.equal(args.filePath1, 'foo.js');
+assert.equal(args.paths[0], 'foo.js');
 // --bar should cause an error since it's invalid
-assert.equal(args.filePath2, '--bar');
-assert.equal(args.errors[0], 'Error: missing or invalid <file_1> and/or <file_2> path.', 'error 4');
+compare(args.errors[0], 'Error: you should provide 2 file paths, found "1".', 'error 4');
 
 args = cli.parse(['--unified', 'foo.js', 'bar.js']);
 assert.ok(args.unified, '--unified');
-assert.equal(args.filePath1, 'foo.js');
-assert.equal(args.filePath2, 'bar.js');
+assert.equal(args.paths[0], 'foo.js');
+assert.equal(args.paths[1], 'bar.js');
 assert.equal(args.errors.length, 0, 'error 5');
 
 args = cli.parse(['-c', 'foo.js', 'bar.js']);
@@ -123,13 +128,9 @@ args = cli.parse(['--chars', 'foo.js', 'bar.js']);
 assert.ok(!args.unified, '!--unified');
 assert.ok(args.chars, '--chars');
 
-args = cli.parse(['--no-color', 'foo.js', 'bar.js']);
-assert.ok(args.errors.length, '--no-color errors');
-assert.ok(args.noColor, '--no-color');
-
-args = cli.parse(['--unified', '--no-color', 'foo.js', 'bar.js']);
-assert.ok(!args.errors.length, '--unified --no-color errors');
-assert.ok(args.noColor, '--no-color');
+args = cli.parse(['--unified-no-color', 'foo.js', 'bar.js']);
+assert.ok(!args.errors.length, '--unified-no-color errors');
+assert.ok(args.unifiedNoColor, '--unified-no-color');
 
 // cli.run
 // =======
@@ -167,31 +168,27 @@ assert.ok(out.data.search('Options:'));
 
 code = run({
   chars: true,
-  filePath1: 'test/file1.js',
-  filePath2: 'test/file2.js'
+  paths: ['test/file1.js', 'test/file2.js']
 });
-expected = readFile('chars.txt');
+expected = readFile('chars_paths.txt');
 assert.ok(!code, 'exit code chars');
-assert.equal(out.data, expected);
+compare(out.data, expected, 'cli chars with paths');
 assert.equal(err.data, '');
 
 code = run({
   unified: true,
-  filePath1: 'test/file1.js',
-  filePath2: 'test/file2.js'
+  paths: ['test/file1.js', 'test/file2.js']
 });
 expected = readFile('unified_2.txt');
 assert.ok(!code, 'exit code chars');
-assert.equal(out.data, expected);
+compare(out.data, expected, 'cli unified_2.txt');
 assert.equal(err.data, '');
 
 code = run({
-  unified: true,
-  noColor: true,
-  filePath1: 'test/file1.js',
-  filePath2: 'test/file2.js'
+  unifiedNoColor: true,
+  paths: ['test/file1.js', 'test/file2.js']
 });
 expected = readFile('unified_no_color.txt');
 assert.ok(!code, 'exit code chars');
-assert.equal(out.data, expected);
+compare(out.data, expected, 'no color');
 assert.equal(err.data, '');

@@ -5,8 +5,8 @@ Colorized string diff ideal for text/code that spans through multiple lines.
 This is basically just a wrapper around
 [diff](https://www.npmjs.com/package/diff) and
 [ansi-styles](https://www.npmjs.com/package/ansi-styles) + line numbers and
-omitting lines that don't have changes and that wouldn't help user identify the
-diff "context".
+omitting lines that don't have changes and/or that wouldn't help user identify
+the diff "context".
 
 We also replace some *invisible* chars to make it easier to understand what
 really changed from one file to another:
@@ -43,15 +43,14 @@ Will return an empty string if `oldStr === newStr`;
 var opts = {
   // how many lines to display before/after a line that contains diffs
   context: 3,
-  // text displayed just before the diff
-  header: '\u001b[41m' + disparity.removed '\u001b[49m \u001b[42m' +
-    disparity.added + '\u001b[49m\n\n'
+  // file paths displayed just before the diff
+  paths: [disparity.removed, disparity.added]
 };
 ```
 
 ![screenshot char diff](https://raw.githubusercontent.com/millermedeiros/disparity/master/screenshots/chars.png)
 
-### unified(oldStr, newStr[, filePathOld, filePathNew]):String
+### unified(oldStr, newStr[, opts]):String
 
 Returns ansi colorized [unified
 diff](http://en.wikipedia.org/wiki/Diff_utility#Unified_format).
@@ -59,13 +58,15 @@ diff](http://en.wikipedia.org/wiki/Diff_utility#Unified_format).
 Will return an empty string if `oldStr === newStr`;
 
 ```js
-var diff = disparity.unified(file1, file2);
+var diff = disparity.unified(file1, file2, {
+  paths: ['test/file1.js', 'test/file2.js']
+});
 console.log(diff);
 ```
 
 ![screenshot unified diff](https://raw.githubusercontent.com/millermedeiros/disparity/master/screenshots/unified.png)
 
-### unifiedNoColor(oldStr, newStr[, filePathOld, filePathNew]):String
+### unifiedNoColor(oldStr, newStr[, opts]):String
 
 Returns [unified diff](http://en.wikipedia.org/wiki/Diff_utility#Unified_format).
 Useful for terminals that [doesn't support colors](https://www.npmjs.com/package/supports-color).
@@ -73,7 +74,9 @@ Useful for terminals that [doesn't support colors](https://www.npmjs.com/package
 Will return an empty string if `oldStr === newStr`;
 
 ```js
-var diff = disparity.unifiedNoColor(file1, file2);
+var diff = disparity.unifiedNoColor(file1, file2, {
+  paths: ['test/file1.js', 'test/file2.js']
+});
 console.log(diff);
 ```
 
@@ -101,7 +104,8 @@ disparity.added = 'added';
 
 Object containing references to all the colors used by disparity.
 
-If you want a different output than `ansi` you can replace the color values:
+If you want a different output than `ansi` (eg. HTML) you can replace the color
+values:
 
 ```js
 // wrap blocks into custom tags
@@ -126,11 +130,11 @@ disparity.colors = {
 disparity [OPTIONS] <file_1> <file_2>
 
 Options:
-  -c, --chars    Output char diff (default mode).
-  -u, --unified  Output unified diff.
-  --no-color     Don't output colors.
-  -v, --version  Display current version.
-  -h, --help     Display this help.
+  -c, --chars           Output char diff (default mode).
+  -u, --unified         Output unified diff.
+  --unified-no-color    Don't output colors.
+  -v, --version         Display current version.
+  -h, --help            Display this help.
 ```
 
 PS: cli can only compare 2 external files at the moment, no `stdin` support.

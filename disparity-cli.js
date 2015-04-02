@@ -9,26 +9,25 @@ exports.parse = function(argv) {
     help: argv.indexOf('--help') !== -1 || argv.indexOf('-h') !== -1 || !argv.length,
     version: argv.indexOf('--version') !== -1 || argv.indexOf('-v') !== -1,
     unified: argv.indexOf('-u') !== -1 || argv.indexOf('--unified') !== -1,
-    noColor: argv.indexOf('--no-color') !== -1,
-    filePath1: argv[argv.length - 2] || '--',
-    filePath2: argv[argv.length - 1] || '--',
+    unifiedNoColor: argv.indexOf('-x') !== -1 || argv.indexOf('--unified-no-color') !== -1,
+    paths: argv.slice(-2).filter(nonArgs),
     errors: []
   };
   // default mode is "--chars"
   args.chars = !args.unified;
 
-  var re = /^-/;
-  if (!args.help && !args.version &&
-    (args.filePath1.match(re) || args.filePath2.match(re))) {
-    args.errors.push('Error: missing or invalid <file_1> and/or <file_2> path.');
-  }
-
-  if (args.noColor && args.chars) {
-    args.errors.push('Error: "--no-color" flag can only be used with "--unified" diff.');
+  var len = args.paths.length;
+  if (!args.help && !args.version && len !== 2) {
+    args.errors.push('Error: you should provide 2 file paths, found "' + len + '".');
   }
 
   return args;
 };
+
+function nonArgs(val) {
+  // arguments starts with "-" so we ignore those
+  return val.indexOf('-') !== 0;
+}
 
 exports.run = function(args, out, err) {
   out = out || process.stdout;
@@ -54,19 +53,21 @@ exports.run = function(args, out, err) {
   }
 
   var fs = require('fs');
-  var p1 = args.filePath1;
-  var p2 = args.filePath2;
-  var f1 = fs.readFileSync(p1).toString();
-  var f2 = fs.readFileSync(p2).toString();
+  var f1 = fs.readFileSync(args.paths[0]).toString();
+  var f2 = fs.readFileSync(args.paths[1]).toString();
 
+  var method = 'chars';
   if (args.unified) {
-    var method = args.noColor ? 'unifiedNoColor' : 'unified';
-    out.write(disparity[method](f1, f2, p1, p2));
-    return 0;
+    method = 'unified';
+  }
+  if (args.unifiedNoColor) {
+    method = 'unifiedNoColor';
   }
 
   // defaul to char diff
-  out.write(disparity.chars(f1, f2));
+  out.write(disparity[method](f1, f2, {
+    paths: args.paths
+  }));
   return 0;
 };
 

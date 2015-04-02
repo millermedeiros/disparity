@@ -21,8 +21,8 @@ exports.colors = {
 
 // ---
 
-function chars(oldStr, newStr, opts) {
-  if (oldStr === newStr) {
+function chars(str1, str2, opts) {
+  if (str1 === str2) {
     return '';
   }
 
@@ -34,18 +34,18 @@ function chars(oldStr, newStr, opts) {
     context = 3;
   }
 
-  // text displayed before diff
-  var header = opts.header;
-  if (header == null) {
-    header = colorize(exports.removed, 'charsRemoved') + ' ' +
-      colorize(exports.added, 'charsAdded') + '\n\n';
-  }
+  var path1 = opts.paths && opts.paths[0] || exports.removed;
+  var path2 = opts.paths && opts.paths[1] || exports.added;
 
-  var changes = stringDiff.diffChars(oldStr, newStr);
+  // text displayed before diff
+  var header = colorize(path1, 'charsRemoved') + ' ' +
+    colorize(path2, 'charsAdded') + '\n\n';
+
+  var changes = stringDiff.diffChars(str1, str2);
   var diff = changes.map(function(c) {
     var val = replaceInvisibleChars(c.value);
-    if (c.added) return colorize(val, 'charsAdded');
     if (c.removed) return colorize(val, 'charsRemoved');
+    if (c.added) return colorize(val, 'charsAdded');
     return val;
   }).join('');
 
@@ -126,12 +126,12 @@ function escapeRegExp(str) {
   return str.replace(/\W/g,'\\$&');
 }
 
-function unified(oldStr, newStr, filePathOld, filePathNew) {
-  if (newStr === oldStr) {
+function unified(str1, str2, opts) {
+  if (str2 === str1) {
     return '';
   }
 
-  var changes = unifiedNoColor(oldStr, newStr, filePathOld, filePathNew);
+  var changes = unifiedNoColor(str1, str2, opts);
   // this RegExp will include all the `\n` chars into the lines, easier to join
   var lines = changes.split(/^/m);
 
@@ -145,26 +145,35 @@ function unified(oldStr, newStr, filePathOld, filePathNew) {
   return start + end;
 }
 
-function unifiedNoColor(oldStr, newStr, filePathOld, filePathNew) {
-  if (newStr === oldStr) {
+function unifiedNoColor(str1, str2, opts) {
+  if (str2 === str1) {
     return '';
   }
 
-  filePathOld = filePathOld || '';
-  filePathNew = filePathNew || filePathOld;
+  opts = opts || {};
+  var path1 = opts.paths && opts.paths[0] || '';
+  var path2 = opts.paths && opts.paths[1] || path1;
 
-  var changes = stringDiff.createPatch('', oldStr, newStr, exports.removed, exports.added);
+  var changes = stringDiff.createPatch('', str1, str2, '', '');
 
   // remove first 2 lines (header)
   changes = changes.replace(/^([^\n]+)\n([^\n]+)\n/m, '');
 
-  function appendPath(str, filePath) {
-    return str + (filePath ? ' ' + filePath + '\t' : ' ');
+  function appendPath(str, filePath, state) {
+    var result = str;
+    if (filePath) {
+      result += ' ' + filePath;
+    }
+    if (state) {
+      result += filePath ? '\t' : ' ';
+      result += state;
+    }
+    return result;
   }
 
   changes = changes
-    .replace(/^\+\+\+\s+/gm, appendPath('+++', filePathNew))
-    .replace(/^---\s+/gm, appendPath('---', filePathOld));
+    .replace(/^---.*/gm, appendPath('---', path1, exports.removed))
+    .replace(/^\+\+\+.*/gm, appendPath('+++', path2, exports.added));
 
   return changes;
 }
