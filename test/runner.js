@@ -107,12 +107,14 @@ assert.equal(args.errors.length, 0, 'error 2');
 
 args = cli.parse(['-u']);
 compare(args.errors[0], 'Error: you should provide 2 file paths, found "0".', 'error 3');
+assert.equal(args.errors.length, 1, 'error 3.2');
 
 args = cli.parse(['-u', 'foo.js', '--bar']);
 assert.ok(args.unified, '-u');
 assert.equal(args.paths[0], 'foo.js');
 // --bar should cause an error since it's invalid
 compare(args.errors[0], 'Error: you should provide 2 file paths, found "1".', 'error 4');
+assert.equal(args.errors.length, 1, 'error 4.2');
 
 args = cli.parse(['--unified', 'foo.js', 'bar.js']);
 assert.ok(args.unified, '--unified');

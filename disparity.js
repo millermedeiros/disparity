@@ -29,10 +29,7 @@ function chars(str1, str2, opts) {
   opts = opts || {};
 
   // how many lines to add before/after the chars diff
-  var context = opts.context;
-  if (context == null) {
-    context = 3;
-  }
+  var context = opts.context != null ? opts.context : 3;
 
   var path1 = opts.paths && opts.paths[0] || exports.removed;
   var path2 = opts.paths && opts.paths[1] || exports.added;
@@ -52,15 +49,17 @@ function chars(str1, str2, opts) {
   // this RegExp will include the '\n' char into the lines, easier to join()
   var lines = diff.split(/^/m);
 
-  // add line numbers
-  var nChars = lines.length.toString().length;
-  lines = lines.map(function(line, i) {
-    return rightAlign(i + 1, nChars) + ' | ' + line;
-  });
-
+  lines = addLineNumbers(lines);
   lines = removeLinesOutOfContext(lines, context);
 
   return header + lines.join('');
+}
+
+function addLineNumbers(lines) {
+  var nChars = lines.length.toString().length;
+  return lines.map(function(line, i) {
+    return alignRight(i + 1, nChars) + ' | ' + line;
+  });
 }
 
 function colorize(str, colorId) {
@@ -76,54 +75,48 @@ function replaceInvisibleChars(str) {
     .replace(/\n/g, '<LF>\n');
 }
 
-function rightAlign(val, nChars) {
+function alignRight(val, nChars) {
   val = val.toString();
   var diff = nChars - val.length;
   return diff ? (new Array(diff + 1)).join(' ') + val : val;
 }
 
 function removeLinesOutOfContext(lines, context) {
+  // we cache the results since same line ends up being checked multiple times
   var diffMap = {};
+  var lastDiff = -Infinity;
   function hasDiff(line, i) {
-    if (diffMap[i] || hasCharDiff(line)) {
-      diffMap[i] = true;
-      return true;
+    if (!(i in diffMap)) {
+      diffMap[i] = hasCharDiff(line);
+    }
+    return diffMap[i];
+  }
+
+  function hasDiffBefore(i) {
+    return lastDiff + context >= i;
+  }
+
+  function hasDiffAfter(i) {
+    var max = Math.min(i + context, lines.length - 1);
+    var n = i;
+    while (++n <= max) {
+      if (hasDiff(lines[n], n)) return true;
     }
     return false;
   }
 
   return lines.filter(function(line, i, arr) {
-    if (hasDiff(line, i)) {
-      return true;
+    var has = hasDiff(line, i);
+    if (has) {
+      lastDiff = i;
     }
-
-    var min = Math.max(i - context, 0);
-    var n = i;
-    while (--n >= min) {
-      if (hasDiff(arr[n], n)) {
-        return true;
-      }
-    }
-
-    var max = Math.min(i + context, arr.length - 1);
-    n = i;
-    while (++n <= max) {
-      if (hasDiff(arr[n], n)) {
-        return true;
-      }
-    }
-
-    return false;
+    return has || hasDiffBefore(i) || hasDiffAfter(i);
   });
 }
 
 function hasCharDiff(line) {
   return line.indexOf(exports.colors.charsAdded.open) !== -1 ||
     line.indexOf(exports.colors.charsRemoved.open) !== -1;
-}
-
-function escapeRegExp(str) {
-  return str.replace(/\W/g,'\\$&');
 }
 
 function unified(str1, str2, opts) {
@@ -135,7 +128,6 @@ function unified(str1, str2, opts) {
   // this RegExp will include all the `\n` chars into the lines, easier to join
   var lines = changes.split(/^/m);
 
-  // we avoid colorizing the line breaks
   var start = colorize(lines.slice(0, 2).join(''), 'header');
   var end = lines.slice(2).join('')
     .replace(/^\-.*/gm, colorize('$&', 'removed'))
