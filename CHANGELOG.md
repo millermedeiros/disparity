@@ -1,5 +1,10 @@
 # disparity changelog
 
+## v3.0.0 (2019/11/06)
+
+ - BREAKING: Only supports node >= 8
+ - Fixed security issue with outdated dependencies
+
 ## v2.0.0 (2015/04/03)
 
  - change API so all methods have same signature (str1, str2, opts).
