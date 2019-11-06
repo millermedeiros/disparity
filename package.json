@@ -1,6 +1,6 @@
 {
   "name": "disparity",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Colorized string diff ideal for text/code that spans through multiple lines",
   "main": "disparity.js",
   "bin": "bin/disparity",
