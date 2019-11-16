@@ -44,5 +44,6 @@
   "jshintConfig": {
     "node": true,
     "eqnull": true
-  }
+  },
+  "devDependencies": {}
 }
