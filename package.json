@@ -40,8 +40,8 @@
   },
   "homepage": "https://github.com/millermedeiros/disparity",
   "dependencies": {
-    "ansi-styles": "^4.1.0",
-    "diff": "^4.0.1"
+    "ansi-styles": "^4.2.1",
+    "diff": "^4.0.2"
   },
   "jshintConfig": {
     "node": true,
