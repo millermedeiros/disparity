@@ -1,5 +1,7 @@
 # disparity changelog
 
+ - Add type definitions for TypeScript support
+
 ## v3.0.0 (2019/11/06)
 
  - BREAKING: Only supports node >= 8
