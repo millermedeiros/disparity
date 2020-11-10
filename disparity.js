@@ -146,7 +146,7 @@ function unifiedNoColor(str1, str2, opts) {
   var path1 = opts.paths && opts.paths[0] || '';
   var path2 = opts.paths && opts.paths[1] || path1;
 
-  var changes = stringDiff.createPatch('', str1, str2, '', '');
+  var changes = stringDiff.createPatch('', str1, str2, '', '', { context: opts.context });
 
   // remove first 2 lines (header)
   changes = changes.replace(/^([^\n]+)\n([^\n]+)\n/m, '');
