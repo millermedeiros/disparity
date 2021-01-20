@@ -1,10 +1,12 @@
 {
   "name": "disparity",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "Colorized string diff ideal for text/code that spans through multiple lines",
   "main": "disparity.js",
   "types": "disparity.d.ts",
-  "bin": "bin/disparity",
+  "bin": {
+    "disparity": "bin/disparity"
+  },
   "scripts": {
     "test": "node test/runner.js"
   },
