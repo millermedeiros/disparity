@@ -1,5 +1,11 @@
 # disparity changelog
 
+## v3.2.0 (2021/01/20)
+
+ - Add support to `context` opt in `unified` function
+
+## v3.1.0
+
  - Add type definitions for TypeScript support
 
 ## v3.0.0 (2019/11/06)
