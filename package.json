@@ -43,7 +43,7 @@
   "homepage": "https://github.com/millermedeiros/disparity",
   "dependencies": {
     "ansi-styles": "^4.2.1",
-    "diff": "^4.0.2"
+    "diff": "^8.0.3"
   },
   "jshintConfig": {
     "node": true,
